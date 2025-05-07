@@ -13,6 +13,7 @@
         <maven.surefire.version>3.0.0-M9</maven.surefire.version>
     </properties>
     <dependencies>
+         <!-- Karate Dependency -->
         <dependency>
             <groupId>com.intuit.karate</groupId>
             <artifactId>karate-junit5</artifactId>
@@ -26,6 +27,7 @@
         </dependency>
     </dependencies>
     <build>
+          <!-- Test Resources from Both POMs -->
         <testResources>
             <testResource>
                 <directory>src/test</directory>
@@ -37,6 +39,7 @@
                 </includes>
             </testResource>
         </testResources>
+           <!-- Plugins from New POM -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
