@@ -1,0 +1,65 @@
+{
+  "Karate - Precondition with token": {
+    "prefix": "karate-precondition",
+    "body": [
+      "@precondition @create @ignore",
+      "Scenario: ${1:Nombre del escenario}",
+      "  # Get Authentication Token",
+      "  * call read('classpath:${2:login/post/features/login.feature}@${3:login}')",
+      "  * header X-Hten-Token = xHtenToken",
+      "  * configure charset = null",
+      "  Given request",
+      "    \"\"\"",
+      "    {",
+      "      \"amount\": 10000,",
+      "      \"tipAmount\": 0,",
+      "      \"currencyCode\": \"CLP\",",
+      "      \"itemConcept\": \"${4:Pago con HTEN}\",",
+      "      \"saleConcept\": \"${5:Hasar-CL Payment}\",",
+      "      \"employeeNumber\": 1234,",
+      "      \"posTransactionId\": \"${6:posId}\",",
+      "      \"posNumber\": #(posNumber),",
+      "      \"storeNumber\": #(storeNumber),",
+      "      \"companyNumber\": #(companyNumber),",
+      "      \"qrType\": \"${7:DYNAMIC}\",",
+      "      \"clientSoftwareVersion\": \"#(clientSoftwareVersion)\"",
+      "    }",
+      "    \"\"\"",
+      "  When method ${8:post}",
+      "  * print response",
+      "  Then status ${9:200}"
+    ],
+    "description": "Crea un escenario con token y cuerpo de request din\u00e1mico"
+  },
+  "Karate - Simple Login Successful": {
+    "prefix": "simple-login-successful",
+    "body": [
+      "@precondition @login @ignore",
+      "Scenario: Successful authentication should return X-Hten-Token",
+      "  * header Authorization = authHeader",
+      "  When method get",
+      "  Then status 200",
+      "  * def xHtenToken = responseHeaders['X-Hten-Token'][0]",
+      "  * print 'Token: ', xHtenToken"
+    ],
+    "description": "Escenario de autenticaci\u00f3n exitosa que devuelve token"
+  },
+  "Karate - Scenario Outline with Table": {
+    "prefix": "simple-table-use",
+    "body": [
+      "@TEN-1096",
+      "Scenario Outline: <methodName> method should return 405 Method Not Allowed",
+      "  * header Authorization = authHeader",
+      "  When method <methodName>",
+      "  Then status 405",
+      "",
+      "  Examples:",
+      "    | methodName |",
+      "    | post       |",
+      "    | put        |",
+      "    | patch      |",
+      "    | delete     |"
+    ],
+    "description": "Escenario outline para validar m\u00e9todos no permitidos"
+  }
+}

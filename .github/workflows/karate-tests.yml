@@ -1,0 +1,35 @@
+name: Karate API Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: '3.9.5'
+
+      - name: Run Karate Tests
+        run: mvn test -Dtest=RunAllTests
+
+      - name: Upload Karate Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: karate-report
+          path: target/karate-reports

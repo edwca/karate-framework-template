@@ -1,0 +1,33 @@
+{
+  "simple-login-successful": {
+    "prefix": "karate-login-token",
+    "body": [
+      "@precondition @login @ignore",
+      "Scenario: Successful authentication should return X-Hten-Token",
+      "* header Authorization = authHeader",
+      "When method get",
+      "Then status 200",
+      "* def xHtenToken = responseHeaders['X-Hten-Token'][0]",
+      "* print 'Token: ', xHtenToken"
+    ],
+    "description": "Login successful scenario that extracts X-Hten-Token"
+  },
+  "simple-table-use": {
+    "prefix": "karate-table-405",
+    "body": [
+      "@TEN-1096",
+      "Scenario Outline: <methodName> method should return 405 Method Not Allowed",
+      "* header Authorization = authHeader",
+      "When method <methodName>",
+      "Then status 405",
+      "",
+      "Examples:",
+      "| methodName |",
+      "| post       |",
+      "| put        |",
+      "| patch      |",
+      "| delete     |"
+    ],
+    "description": "405 Method Not Allowed check using Scenario Outline"
+  }
+}
