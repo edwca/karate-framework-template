@@ -6,7 +6,8 @@ class RunAllTests {
 
   @Karate.Test
   Karate testAll() {
-    return Karate.run("login/post/features/login.feature").relativeTo(getClass());
+        // Toma la ruta dentro del classpath es decir dentro de target/test-classes
+    return Karate.run("classpath:apiTemplateName/login/post/features/login.feature");
   }
 
 }

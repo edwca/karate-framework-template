@@ -41,8 +41,15 @@
     <build>
         <!-- Test Resources from Both POMs -->
         <testResources>
+              <!-- Ruta estándar para variables de entorno -->
             <testResource>
-                <directory>src/test/apiTemplateName</directory>
+                <directory>src/test/resources</directory>
+              </testResource>
+            <testResource>
+                <directory>src/test</directory>
+                <excludes>
+                    <exclude>resources/**</exclude> <!-- ⛔ evita copiar esta carpeta -->
+                  </excludes>
                 <includes>
                     <include>**/*.feature</include>
                     <include>**/*.json</include>

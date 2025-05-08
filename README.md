@@ -14,7 +14,7 @@ Este proyecto automatiza pruebas de servicios REST utilizando [Karate DSL](https
 ---
 
 ## 📁 Estructura del Proyecto
-
+comando para imprimir estructura: > tree /f > estructura.log
 ```
 src/
 ├── test/
