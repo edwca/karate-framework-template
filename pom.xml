@@ -7,39 +7,52 @@
     <version>1.0.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>24</java.version>
-        <karate.version>1.4.1</karate.version>
+        <java.version>17</java.version>
+        <karate.version>1.1.0</karate.version>
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <maven.surefire.version>3.0.0-M9</maven.surefire.version>
     </properties>
     <dependencies>
-         <!-- Karate Dependency -->
+        <!-- Karate Dependency -->
         <dependency>
             <groupId>com.intuit.karate</groupId>
             <artifactId>karate-junit5</artifactId>
             <version>${karate.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                  <groupId>ch.qos.logback</groupId>
+                  <artifactId>logback-classic</artifactId>
+                </exclusion>
+              </exclusions>
         </dependency>
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <version>12.6.1.jre11</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.13</version>
+            <scope>test</scope>
+          </dependency>
     </dependencies>
     <build>
-          <!-- Test Resources from Both POMs -->
+        <!-- Test Resources from Both POMs -->
         <testResources>
             <testResource>
-                <directory>src/test</directory>
+                <directory>src/test/apiTemplateName</directory>
                 <includes>
                     <include>**/*.feature</include>
                     <include>**/*.json</include>
                     <include>**/*.txt</include>
                     <include>**/*.js</include>
+                    <include>**/.env.*</include> 
                 </includes>
             </testResource>
         </testResources>
-           <!-- Plugins from New POM -->
+        <!-- Plugins from New POM -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

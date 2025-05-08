@@ -1,39 +1,49 @@
-function() {
-  var DbUtils = Java.type('utils.DbUtils');
+function fun() {
+  var env = karate.env || 'qa';
+  karate.log('🏷️ Karate env:', env);
+
+  var parsedEnv = {};
+  try {
+    var resourcePath = 'classpath:.env.' + env;
+    karate.log('📂 Buscando archivo en:', resourcePath);
+    var envText = karate.read(resourcePath);
+    var lines = envText.split('\n');
+
+    lines.forEach(function (line) {
+      line = line.trim();
+      if (line && line.indexOf('=') !== -1) {
+        var parts = line.split('=');
+        var key = parts[0].trim();
+        var value = parts[1].trim().replace(/^["']|["']$/g, '');
+        parsedEnv[key] = value;
+      }
+    });
+  } catch (e) {
+    karate.log('⚠️ No se pudo leer el archivo .env.' + env + ':', e.message);
+  }
+
+  // Logging de variables críticas
+  karate.log('📧 Email:', parsedEnv['reqresLoginEmail']);
+  karate.log('🔒 Password:', parsedEnv['reqresLoginPassword']);
+  karate.log('🌐 Base URL:', parsedEnv['BASE_URL']);
+
+  // Configuración de base de datos
+  var DbUtils = Java.type("utils.DbUtils");
   var dbConfig = {
-    user: karate.env == 'qa' ? 'qa_user' : 'dev_user',
-    password: karate.env == 'qa' ? 'qa_pass' : 'dev_pass',
-    server: 'localhost',
-    database: 'karate_test_db',
+    user: env === "qa" ? "qa_user" : "dev_user",
+    password: env === "qa" ? "qa_pass" : "dev_pass",
+    server: "localhost",
+    database: "karate_test_db",
     encrypt: true,
-    trustServerCertificate: true
+    trustServerCertificate: true,
   };
 
-  var config = {
-    BaseUrl: java.lang.System.getenv('BASE_URL') || 'https://reqres.in',
-    companyNumber: 1,
-    storeNumber: 2,
-    posNumber: 3,
-    serverVersion: '3.0.0-dev',
-    clientSoftwareVersion: 'karate.hten:1.0.0',
-    waitForTransactions: 2000,
-    reqresLoginEmail: java.lang.System.getenv('reqresLoginEmail'),
-    reqresLoginPassword: java.lang.System.getenv('reqresLoginPassword'),
-    gnetpos: {
-      serviceName: 'gnetposapi',
-      companyNumber: 1,
-      storeNumber: 2,
-      posNumber: 4,
-      terminalId: '80000109',
-      retailerId: '13382',
-      serialNumber: '22B7KD8G4627',
-      waitForPinpad: 30000
-    },
-    db: new DbUtils(dbConfig)
+  // Configuración final exportada
+  return {
+    BaseUrl: parsedEnv['BASE_URL'] || 'https://reqres.in/',
+    reqresLoginEmail: parsedEnv['reqresLoginEmail'],
+    reqresLoginPassword: parsedEnv['reqresLoginPassword'],
+    db: new DbUtils(dbConfig),
+    // Puedes agregar más propiedades globales aquí si las necesitas
   };
-
-  karate.configure('connectTimeout', 5000);
-  karate.configure('readTimeout', 10000);
-
-  return config;
 }

@@ -9,7 +9,7 @@ Feature: Create user with reqres.in
   @REQRES-USER-01
   Scenario: Create user successfully
     * def payload = { name: 'morpheus', job: 'leader' }
-    * def schema = read('schemas/create-user-success.json')
+    * def schema = read('..schemas/create-user-success.json')
     Given request payload
     When method post
     Then status 201

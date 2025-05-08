@@ -40,15 +40,19 @@ src/
 
 ### ✅ Comandos de Ejecución
 
+Version de java a setear en CLI powerShell:
+
+$env:JAVA_HOME="C:\Program Files\Java\jdk-17.0.12"
+
 ```bash
 # Todos los tests
-mvn test -Dtest=test.RunAllTests "-Dkarate.env=qa"
+mvn test -D"test=test.RunAllTests" -D "karate.env=qa"
 
 # Solo login
-mvn test -Dtest=login.post.RunLoginTests "-Dkarate.env=qa"
+mvn test -Dtest=login.post.RunLoginTests -Dkarate.env=qa
 
 # Solo user
-mvn test -Dtest=user.post.RunUserTests "-Dkarate.env=qa"
+mvn test -Dtest=user.post.RunUserTests -Dkarate.env=qa
 ```
 
 > Asegúrate que las clases `RunLoginTests.java` y `RunUserTests.java` estén ubicadas correctamente bajo `src/test/java/login/post/` y `src/test/java/user/post/` respectivamente.
