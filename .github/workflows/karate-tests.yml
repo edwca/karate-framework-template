@@ -38,13 +38,8 @@ jobs:
 
       # ✅ Ejecuta los tests de Karate
       - name: Run Karate Tests (All)
-        run: |
-          echo "🟢 Iniciando ejecución Karate"
-          mvn test \
-            -Dtest=test.RunAllTests \
-            -Dkarate.env=qa \
-            -Dsurefire.printSummary=false
-    
+        run: mvn test -Dtest=test.RunAllTests -Dkarate.env=qa -Dsurefire.printSummary=false
+
       # ✅ Comprime los reportes generados por Karate
       - name: Zip Karate Reports
         run: zip -r karate-report.zip target/karate-reports || echo "No reports to zip"
