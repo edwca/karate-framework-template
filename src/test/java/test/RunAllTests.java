@@ -21,8 +21,7 @@ class RunAllTests {
   void testAll() {
     result = Runner.path(
         "classpath:apiTemplateName/login/post/features/login.feature",
-        "classpath:apiTemplateName/user/post/features/create-user.feature"
-    ).parallel(1);
+        "classpath:apiTemplateName/user/post/features/create-user.feature").parallel(1);
   }
 
   @AfterAll
@@ -56,9 +55,11 @@ class RunAllTests {
 
     System.out.println("\n📄 Ver reporte: target/karate-reports/karate-summary.html");
 
-    File report = new File("target/karate-reports/karate-summary.html");
-    if (report.exists() && Desktop.isDesktopSupported()) {
-      Desktop.getDesktop().browse(report.toURI());
+    if (!System.getenv().containsKey("GITHUB_ACTIONS")) {
+      File report = new File("target/karate-reports/karate-summary.html");
+      if (report.exists() && Desktop.isDesktopSupported()) {
+        Desktop.getDesktop().browse(report.toURI());
+      }
     }
   }
 }

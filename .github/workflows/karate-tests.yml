@@ -26,8 +26,17 @@ jobs:
       - name: Run Karate Tests (All)
         run: ./scripts/run-all-tests.sh
 
-      - name: Upload Karate Reports
+      - name: Zip Karate Reports
+        run: zip -r karate-report.zip target/karate-reports || echo "No reports to zip"
+
+      - name: Upload Karate Reports Folder
         uses: actions/upload-artifact@v4
         with:
           name: karate-report
           path: target/karate-reports
+
+      - name: Upload Karate Report ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: karate-report-zip
+          path: karate-report.zip
