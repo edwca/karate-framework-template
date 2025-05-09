@@ -37,13 +37,18 @@ jobs:
         run: chmod +x scripts/*.sh
 
       # ✅ Ejecuta los tests de Karate con keep-alive cada 60s
-      - name: Run Karate Tests (All) with keep-alive
+      - name: Run Karate Tests (All) with keep-alive (inline mvn)
         run: |
           echo "🟢 Iniciando ejecución Karate con keep-alive..."
           while true; do echo "⌛ Ejecutando Karate..."; sleep 60; done &
           KEEPALIVE_PID=$!
           trap "kill $KEEPALIVE_PID" EXIT
-          ./scripts/run-all-tests.sh qa
+      
+          mvn test \
+            -Dtest=test.RunAllTests \
+            -Dkarate.env=qa \
+            -Dsurefire.printSummary=false
+    
 
       # ✅ Comprime los reportes generados por Karate
       - name: Zip Karate Reports
