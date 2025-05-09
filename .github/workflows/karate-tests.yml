@@ -49,7 +49,6 @@ jobs:
             -Dkarate.env=qa \
             -Dsurefire.printSummary=false
     
-
       # ✅ Comprime los reportes generados por Karate
       - name: Zip Karate Reports
         run: zip -r karate-report.zip target/karate-reports || echo "No reports to zip"

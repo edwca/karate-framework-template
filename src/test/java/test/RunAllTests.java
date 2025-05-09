@@ -31,35 +31,22 @@ class RunAllTests {
     System.out.printf("❌ Features fallidas: %d\n", result.getFeaturesFailed());
     System.out.printf("✔️  Escenarios pasados: %d\n", result.getScenariosPassed());
     System.out.printf("❌ Escenarios fallidos: %d\n", result.getScenariosFailed());
-
-    // Mostrar detalles de escenarios fallidos
+  
     for (FeatureResult fr : result.getFeatureResults().toList()) {
       for (ScenarioResult sr : fr.getScenarioResults()) {
         if (sr.isFailed()) {
           System.out.println("\n🚨 ******* Escenario fallido *******:");
           System.out.println("   📌 Nombre: ---->  " + sr.getScenario().getName());
           System.out.println("   🗂  Ubicacion: ----> " + fr.getFeature().getResource().getRelativePath());
-
-          // Uso de utilidad para simplificar mensajes de error
+  
           String errorMessage = sr.getError().getMessage();
           String relevantErrorLine = KarateErrorUtils.extractRelevantJsErrorLine(errorMessage);
-          if (relevantErrorLine != null) {
-            System.out.println("   ❗ Error resumido: " + relevantErrorLine);
-          } else {
-            System.out.println("   ❗ Error resumido: " + errorMessage);
-          }
-
+          System.out.println("   ❗ Error resumido: " + (relevantErrorLine != null ? relevantErrorLine : errorMessage));
         }
       }
     }
-
+  
     System.out.println("\n📄 Ver reporte: target/karate-reports/karate-summary.html");
-
-    if (!System.getenv().containsKey("GITHUB_ACTIONS")) {
-      File report = new File("target/karate-reports/karate-summary.html");
-      if (report.exists() && Desktop.isDesktopSupported()) {
-        Desktop.getDesktop().browse(report.toURI());
-      }
-    }
   }
+  
 }
