@@ -27,7 +27,7 @@ jobs:
         run: ./scripts/run-all-tests.sh
 
       - name: Upload Karate Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: karate-report
           path: target/karate-reports
