@@ -40,22 +40,45 @@ src/
 
 ### ✅ Comandos de Ejecución
 
-Version de java a setear en CLI powerShell:
-
-$env:JAVA_HOME="C:\Program Files\Java\jdk-17.0.12"
+Antes de ejecutar debemos considerar tener la versión de java instalada 
+si no existe su variable de entorno seteada podemos a través de powerShell usar:
 
 ```bash
-# Todos los tests
-mvn test -D"test=test.RunAllTests" -D "karate.env=qa"
+$env:JAVA_HOME="C:\Program Files\Java\jdk-17"
+```
+
+## Importante
+
+> Por defecto karate-config.js esta preparado para trabajar con 
+un environment en este caso .qa por lo que cualqueir comando que
+no incluya esta información se va a ejecutar contra QA, pero 
+si queremos setear otro ambiente debemos usar el parametro
+"-Dkarate.env=qa", "-Dkarate.env=devel", "-Dkarate.env=pre-prod"
+archivos que podemos encontrar en 
+
+```bash
+src\test\resources\env.qa.json
+```
+
+## Ejecuciones Manuales desde CLI powerShell
+
+```bash
+# Todos los tests - "-Dsurefire.printSummary=false" imprime en consola un log mas limpio
+mvn test "-Dtest=test.RunAllTests" "-Dkarate.env=qa" "-Dsurefire.printSummary=false" 
 
 # Solo login
-mvn test -Dtest=login.post.RunLoginTests -Dkarate.env=qa
+mvn test "-Dtest=test.RunLoginTests" "-Dkarate.env=qa" "-Dsurefire.printSummary=false" 
 
 # Solo user
-mvn test -Dtest=user.post.RunUserTests -Dkarate.env=qa
+mvn test "-Dtest=test.RunUserTests" "-Dkarate.env=qa" "-Dsurefire.printSummary=false" 
 ```
 
 > Asegúrate que las clases `RunLoginTests.java` y `RunUserTests.java` estén ubicadas correctamente bajo `src/test/java/login/post/` y `src/test/java/user/post/` respectivamente.
+
+
+## Ejecuciones Manuales desde CLI gitBash con script
+> En terminal bash ejecutar "bash script/run-login-tests.sh", archivo que contiene los comandos para correr todos los test
+
 
 ---
 

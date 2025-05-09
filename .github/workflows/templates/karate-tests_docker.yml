@@ -1,4 +1,4 @@
-name: Karate API Tests
+name: Karate API Tests with Docker
 
 on:
   push:
@@ -14,17 +14,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '24'
+      - name: Build Docker image
+        run: docker build -t karate-tests .
 
-      - name: Make scripts executable
-        run: chmod +x scripts/*.sh
-
-      - name: Run Karate Tests (All)
-        run: ./scripts/run-all-tests.sh
+      - name: Run Karate Tests inside Docker
+        run: docker run --rm -v ${{ github.workspace }}/target:/app/target karate-tests
 
       - name: Upload Karate Reports
         uses: actions/upload-artifact@v3
