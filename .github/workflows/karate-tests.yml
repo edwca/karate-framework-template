@@ -1,45 +1,62 @@
-name: Karate API Tests
-
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ Clona el repositorio
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # ✅ Configura Java 24 con Temurin
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: "24"
 
+      # ✅ Cachea las dependencias Maven para acelerar builds futuros
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      # ✅ Da permisos de ejecución a los scripts en el repo
       - name: Make scripts executable
         run: chmod +x scripts/*.sh
 
+      # ✅ Ejecuta los tests de Karate con keep-alive cada 60s
       - name: Run Karate Tests (All) with keep-alive
         run: |
           echo "🟢 Iniciando ejecución Karate con keep-alive..."
           while true; do echo "⌛ Ejecutando Karate..."; sleep 60; done &
           KEEPALIVE_PID=$!
-          ./scripts/run-all-tests.sh || true
+          ./scripts/run-all-tests.sh qa
           kill $KEEPALIVE_PID
 
+      # ✅ Comprime los reportes generados por Karate
       - name: Zip Karate Reports
         run: zip -r karate-report.zip target/karate-reports || echo "No reports to zip"
 
+      # ✅ Sube la carpeta de reportes como artefacto
       - name: Upload Karate Reports Folder
         uses: actions/upload-artifact@v4
         with:
           name: karate-report
           path: target/karate-reports
 
+      # ✅ Sube el .zip de reportes como artefacto adicional
       - name: Upload Karate Report ZIP
         uses: actions/upload-artifact@v4
         with:

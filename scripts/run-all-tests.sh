@@ -1,6 +1,14 @@
 #!/bin/bash
-set -e
-#export JAVA_HOME="C:\Program Files\Java\jdk-17"
-echo "✅ Iniciando ejecución Karate (ambiente: ${1:-qa})..."
-mvn test -Dtest=test.RunAllTests -Dkarate.env=${1:-qa} -Dsurefire.printSummary=false
-echo "✅ Ejecución finalizada"
+set -euo pipefail
+
+ENVIRONMENT="${1:-qa}"
+
+echo "🚀 Iniciando ejecución de pruebas Karate (entorno: $ENVIRONMENT)..."
+
+# Ejecutar pruebas especificando la clase de test y el entorno
+mvn test \
+  -Dtest=test.RunAllTests \
+  -Dkarate.env="$ENVIRONMENT" \
+  -Dsurefire.printSummary=false
+
+echo "✅ Ejecución finalizada correctamente para entorno: $ENVIRONMENT"
