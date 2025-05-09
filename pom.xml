@@ -21,10 +21,10 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                  <groupId>ch.qos.logback</groupId>
-                  <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
                 </exclusion>
-              </exclusions>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
@@ -36,26 +36,26 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.13</version>
             <scope>test</scope>
-          </dependency>
+        </dependency>
     </dependencies>
     <build>
         <!-- Test Resources from Both POMs -->
         <testResources>
-              <!-- Ruta estándar para variables de entorno -->
+            <!-- Ruta estándar para variables de entorno -->
             <testResource>
                 <directory>src/test/resources</directory>
-              </testResource>
+            </testResource>
             <testResource>
                 <directory>src/test</directory>
                 <excludes>
                     <exclude>resources/**</exclude> <!-- ⛔ evita copiar esta carpeta -->
-                  </excludes>
+                </excludes>
                 <includes>
                     <include>**/*.feature</include>
                     <include>**/*.json</include>
                     <include>**/*.txt</include>
                     <include>**/*.js</include>
-                    <include>**/.env.*</include> 
+                    <include>**/.env.*</include>
                 </includes>
             </testResource>
         </testResources>
@@ -74,7 +74,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.version}</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                    <includes>
+                        <include>**/RunAllTests.java</include>
+                    </includes>
+                    <properties>
+                        <configurationParameters>junit.jupiter.extensions.autodetection.enabled=true</configurationParameters>
+                    </properties>
+                </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>
