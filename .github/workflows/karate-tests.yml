@@ -42,8 +42,8 @@ jobs:
           echo "🟢 Iniciando ejecución Karate con keep-alive..."
           while true; do echo "⌛ Ejecutando Karate..."; sleep 60; done &
           KEEPALIVE_PID=$!
+          trap "kill $KEEPALIVE_PID" EXIT
           ./scripts/run-all-tests.sh qa
-          kill $KEEPALIVE_PID
 
       # ✅ Comprime los reportes generados por Karate
       - name: Zip Karate Reports
