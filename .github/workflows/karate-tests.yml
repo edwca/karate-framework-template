@@ -2,9 +2,9 @@ name: Karate API Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -17,14 +17,19 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '24'
+          distribution: "temurin"
+          java-version: "24"
 
       - name: Make scripts executable
         run: chmod +x scripts/*.sh
 
-      - name: Run Karate Tests (All)
-        run: ./scripts/run-all-tests.sh
+      - name: Run Karate Tests (All) with keep-alive
+        run: |
+          echo "🟢 Iniciando ejecución Karate con keep-alive..."
+          while true; do echo "⌛ Ejecutando Karate..."; sleep 60; done &
+          KEEPALIVE_PID=$!
+          ./scripts/run-all-tests.sh || true
+          kill $KEEPALIVE_PID
 
       - name: Zip Karate Reports
         run: zip -r karate-report.zip target/karate-reports || echo "No reports to zip"

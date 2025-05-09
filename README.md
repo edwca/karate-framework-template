@@ -10,30 +10,349 @@ Este proyecto automatiza pruebas de servicios REST utilizando [Karate DSL](https
 - **Apache Maven 3.8+**
 - **Node.js** *(opcional, si usas JS en hooks o scripts complementarios)*
 - **Visual Studio Code** (recomendado) con extensiones para Java
-
+- **Karate 1.1.0** Recomendado por dependencias del proyecto
+- **karate-junit5** Recomendado por dependencias del proyecto
 ---
 
 ## 📁 Estructura del Proyecto
-comando para imprimir estructura: > tree /f > estructura.log
 ```
-src/
-├── test/
-│   ├── java/
-│   │   └── test/
-│   │       └── RunAllTests.java
-│   │       └── login/post/RunLoginTests.java
-│   │       └── user/post/RunUserTests.java
-│   ├── apiTemplateName/
-│   │   ├── login/
-│   │   │   └── post/
-│   │   │       └── features/
-│   │   │           └── login.feature
-│   │   └── user/
-│   │       └── post/
-│   │           └── features/
-│   │               └── create-user.feature
-├── karate-config.js
-└── README.md
+Listado de rutas de carpetas para el volumen OS
+El n·mero de serie del volumen es 62C7-8631
+C:.
+ª   .gitignore
+ª   dockerfile
+ª   estructura.log
+ª   pom.xml
+ª   README.md
+ª   
++---.github
+ª   +---workflows
+ª       ª   karate-tests.yml
+ª       ª   
+ª       +---templates
+ª               karate-tests_docker.yml
+ª               karate-tests_sh.yml
+ª               
++---.vscode
+ª       karate-snippets.code-snippets
+ª       karate.code-snippets
+ª       settings.json
+ª       
++---logs
+ª       run-login-tests.log
+ª       
++---script
+ª       run-login-tests.sh
+ª       
++---src
+ª   +---test
+ª       +---apiTemplateName
+ª       ª   +---database
+ª       ª   ª   +---data
+ª       ª   ª   +---feature
+ª       ª   ª           all-databases.feature
+ª       ª   ª           test-db.feature
+ª       ª   ª           
+ª       ª   +---login
+ª       ª   ª   +---post
+ª       ª   ª       +---data
+ª       ª   ª       ª       dynamic-data.js
+ª       ª   ª       ª       
+ª       ª   ª       +---features
+ª       ª   ª       ª       login.feature
+ª       ª   ª       ª       
+ª       ª   ª       +---schemas
+ª       ª   ª               login-error.json
+ª       ª   ª               login-successful.json
+ª       ª   ª               login-unauthorized.json
+ª       ª   ª               
+ª       ª   +---user
+ª       ª       +---post
+ª       ª           +---features
+ª       ª           ª       create-user.feature
+ª       ª           ª       
+ª       ª           +---schemas
+ª       ª                   create-user-success.json
+ª       ª                   
+ª       +---auth
+ª       ª       authorization-header.txt
+ª       ª       
+ª       +---java
+ª       ª   +---test
+ª       ª   ª       RunAllTests.java
+ª       ª   ª       RunLoginTests.java
+ª       ª   ª       RunUserTests.java
+ª       ª   ª       
+ª       ª   +---utils
+ª       ª           DbUtils.java
+ª       ª           KarateErrorUtils.java
+ª       ª           
+ª       +---resources
+ª               env.qa.devel.json
+ª               env.qa.json
+ª               env.qa.pre-prod.json
+ª               karate-config.js
+ª               logback-test.xml
+ª               simplelogger.properties
+ª               
++---target
+    +---classes
+    +---generated-test-sources
+    ª   +---test-annotations
+    +---karate-reports
+    ª   ª   apiTemplateName.user.post.features.create-user.html
+    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746812971037
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   apiTemplateName.user.post.features.create-user.html
+    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746813133450
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   apiTemplateName.user.post.features.create-user.html
+    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746813278651
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   apiTemplateName.user.post.features.create-user.html
+    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746814833624
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   apiTemplateName.user.post.features.create-user.html
+    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746815289161
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   apiTemplateName.user.post.features.create-user.html
+    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746815378255
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746815391617
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   apiTemplateName.user.post.features.create-user.html
+    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---karate-reports_1746815404539
+    ª   ª   apiTemplateName.login.post.features.login.html
+    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
+    ª   ª   favicon.ico
+    ª   ª   karate-logo.png
+    ª   ª   karate-logo.svg
+    ª   ª   karate-progress-json.txt
+    ª   ª   karate-summary-json.txt
+    ª   ª   karate-summary.html
+    ª   ª   karate-tags.html
+    ª   ª   karate-timeline.html
+    ª   ª   
+    ª   +---res
+    ª           bootstrap.min.css
+    ª           bootstrap.min.js
+    ª           jquery.min.js
+    ª           jquery.tablesorter.min.js
+    ª           karate-report.css
+    ª           karate-report.js
+    ª           
+    +---maven-status
+    ª   +---maven-compiler-plugin
+    ª       +---testCompile
+    ª           +---default-testCompile
+    ª                   createdFiles.lst
+    ª                   inputFiles.lst
+    ª                   
+    +---surefire-reports
+    ª       TEST-test.RunAllTests.xml
+    ª       TEST-test.RunLoginTests.xml
+    ª       TEST-test.RunUserTests.xml
+    ª       test.RunAllTests.txt
+    ª       test.RunLoginTests.txt
+    ª       test.RunUserTests.txt
+    ª       
+    +---test-classes
+        ª   env.qa.devel.json
+        ª   env.qa.json
+        ª   env.qa.pre-prod.json
+        ª   karate-config.js
+        ª   logback-test.xml
+        ª   simplelogger.properties
+        ª   
+        +---apiTemplateName
+        ª   +---database
+        ª   ª   +---feature
+        ª   ª           all-databases.feature
+        ª   ª           test-db.feature
+        ª   ª           
+        ª   +---login
+        ª   ª   +---post
+        ª   ª       +---data
+        ª   ª       ª       dynamic-data.js
+        ª   ª       ª       
+        ª   ª       +---features
+        ª   ª       ª       login.feature
+        ª   ª       ª       
+        ª   ª       +---schemas
+        ª   ª               login-error.json
+        ª   ª               login-successful.json
+        ª   ª               login-unauthorized.json
+        ª   ª               
+        ª   +---user
+        ª       +---post
+        ª           +---features
+        ª           ª       create-user.feature
+        ª           ª       
+        ª           +---schemas
+        ª                   create-user-success.json
+        ª                   
+        +---auth
+        ª       authorization-header.txt
+        ª       
+        +---test
+        ª       RunAllTests.class
+        ª       RunLoginTests.class
+        ª       RunUserTests.class
+        ª       
+        +---utils
+                DbUtils.class
+                KarateErrorUtils.class
+                
 ```
 
 ---
