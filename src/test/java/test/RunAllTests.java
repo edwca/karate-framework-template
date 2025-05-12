@@ -13,40 +13,41 @@ import java.io.IOException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
-class RunAllTests {
+public class RunAllTests {
 
-  static Results result;
+    static Results result;
 
-  @Test
-  void testAll() {
-    result = Runner.path(
-        "classpath:apiTemplateName/login/post/features/login.feature",
-        "classpath:apiTemplateName/user/post/features/create-user.feature").parallel(1);
-  }
-
-  @AfterAll
-  static void resumenFinal() throws IOException {
-    System.out.println("\n✅ Finalizó la ejecución de pruebas Karate.");
-    System.out.printf("✔️  Features pasadas: %d\n", result.getFeaturesPassed());
-    System.out.printf("❌ Features fallidas: %d\n", result.getFeaturesFailed());
-    System.out.printf("✔️  Escenarios pasados: %d\n", result.getScenariosPassed());
-    System.out.printf("❌ Escenarios fallidos: %d\n", result.getScenariosFailed());
-  
-    for (FeatureResult fr : result.getFeatureResults().toList()) {
-      for (ScenarioResult sr : fr.getScenarioResults()) {
-        if (sr.isFailed()) {
-          System.out.println("\n🚨 ******* Escenario fallido *******:");
-          System.out.println("   📌 Nombre: ---->  " + sr.getScenario().getName());
-          System.out.println("   🗂  Ubicacion: ----> " + fr.getFeature().getResource().getRelativePath());
-  
-          String errorMessage = sr.getError().getMessage();
-          String relevantErrorLine = KarateErrorUtils.extractRelevantJsErrorLine(errorMessage);
-          System.out.println("   ❗ Error resumido: " + (relevantErrorLine != null ? relevantErrorLine : errorMessage));
-        }
-      }
+    @Test
+    void testLogin() {
+        result = Runner.path("classpath:apiTemplateName/login/post/features/login.feature","classpath:apiTemplateName/user/post/features/create-user.feature" )
+                .parallel(1);
     }
-  
-    System.out.println("\n📄 Ver reporte: target/karate-reports/karate-summary.html");
-  }
-  
+
+    @AfterAll
+    static void resumenFinal() throws IOException {
+        System.out.println("\n✅ Finalizó la ejecución de pruebas LOGIN.");
+        System.out.printf("✔️  Features pasadas: %d\n", result.getFeaturesPassed());
+        System.out.printf("❌ Features fallidas: %d\n", result.getFeaturesFailed());
+        System.out.printf("✔️  Escenarios pasados: %d\n", result.getScenariosPassed());
+        System.out.printf("❌ Escenarios fallidos: %d\n", result.getScenariosFailed());
+
+        for (FeatureResult fr : result.getFeatureResults().toList()) {
+            for (ScenarioResult sr : fr.getScenarioResults()) {
+                if (sr.isFailed()) {
+                    System.out.println("\n🚨 ******* Escenario fallido *******:");
+                    System.out.println("   📌 Nombre: ---->  " + sr.getScenario().getName());
+                    System.out.println("   🗂  Ubicacion: ----> " + fr.getFeature().getResource().getRelativePath());
+                    String errorMessage = sr.getError().getMessage();
+                    String relevant = KarateErrorUtils.extractRelevantJsErrorLine(errorMessage);
+                    System.out.println("   ❗ Error resumido: " + relevant);
+                }
+            }
+        }
+
+        System.out.println("\n📄 Ver reporte: target/karate-reports/karate-summary.html");
+        File report = new File("target/karate-reports/karate-summary.html");
+        if (report.exists() && Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().browse(report.toURI());
+        }
+    }
 }
