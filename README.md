@@ -8,6 +8,7 @@ Este proyecto automatiza pruebas de servicios REST utilizando [Karate DSL](https
 
 - **Java 17 o superior** (Karate no es compatible con Java 24 actualmente --> https://adoptium.net/en-GB/temurin/releases/?version=17&os=any&arch=any)
 - **Apache Maven 3.8+** (https://maven.apache.org/download.cgi)
+- **El proyecto utiliza y configura jUnit5**
 - **Node.js** *(opcional, si usas JS en hooks o scripts complementarios)*
 - **Visual Studio Code** (recomendado) con extensiones para Java
 - **Karate 1.1.0** Recomendado por dependencias del proyecto
@@ -15,8 +16,8 @@ Este proyecto automatiza pruebas de servicios REST utilizando [Karate DSL](https
 - **Crear variables de sitema** de entorno %JAVA_HOME%\bin, %MAVEN_HOME%\bin, TNS_ADMIN(con la ubicacion del tsnames)
 - **Agregar rutas de instlacion en path de sistema**
 - **Agregar extension XML / karate (opcional ideal para la versión pagada)**
-- **Agregar variable de entorno con key para encryptar y decencryptar "ENV_SECRET_KEY"**
-- **Considerar subir tsnames.ora como archivo "Pipelines > Library > Secure Files" y otorgar permisos**
+- **Agregar variable de entorno con key para encryptar y decencryptar "ENV_SECRET_KEY" en entorno de deploy**
+- **Este proyecto ocupa conexion a db oracle y sql para el caso del primero subir tsnames.ora como archivo en el caso de azure pipelina "Pipelines > Library > Secure Files" y otorgar permisos**
 
 # Comprobar instalaciones
 ```
@@ -27,93 +28,58 @@ Este proyecto automatiza pruebas de servicios REST utilizando [Karate DSL](https
 
 ## 📁 Estructura del Proyecto
 ```
-📁 api-testing/
-├── .github/                         # Workflows de CI/CD
-│   └── workflows/
-│       ├── karate-tests.yml
-│       └── templates/
-│           ├── karate-tests_docker.yml
-│           └── karate-tests_sh.yml
+## 📁 Estructura del Proyecto Karate
 
-├── .vscode/                         # Configuraciones de VSCode
-│   ├── karate.code-snippets
-│   └── settings.json
+```bash
+.
+├── .github
+│   └── workflows
+│       └── templates
+├── .vscode
+├── scripts
+│   ├── input
+│   └── out-put
+├── src
+│   ├── java
+│   │   ├── test
+│   │   └── utils
+│   ├── resources
+│   │   └── files
+│   └── test
+│       ├── common
+│       ├── content-manager-api
+│       │   └── document/post
+│       │       ├── auth
+│       │       ├── data/payload
+│       │       ├── features
+│       │       └── schemas
+│       └── template-api
+│           ├── database/get/features
+│           ├── login/post
+│           │   ├── data
+│           │   ├── features
+│           │   └── schemas
+│           └── user/post
+│               ├── data
+│               ├── features
+│               └── schemas
+├── target
+│   ├── karate-reports              # Reportes principales
+│   ├── karate-reports_*            # Reportes históricos por timestamp
+│   ├── surefire-reports            # Resultados de test
+│   └── test-classes                # Clases compiladas
+├── .gitignore
+├── dockerfile
+├── pom.xml
+├── karate-config.js
+├── KaratePipelineWin.yml
+├── karatePipeLinux.yml
+├── README.md
+├── estructura-proyecto.txt
+└── archivos .enc de entorno (env.qa.json.enc, env.devel.json.enc, ...)
+```
 
-├── scripts/                         # Scripts para generación y ejecución
-│   ├── generate-karate-schema.js
-│   ├── generate-schema.sh / .bat
-│   ├── input/
-│   │   └── input-response.json      # Ejemplo: response copiado desde Postman
-│   └── out-put/
-│       └── schema.json              # Schema generado automáticamente
-
-├── src/
-│   ├── java/
-│   │   ├── test/                    # Clases Runner de Karate
-│   │   │   ├── RunAllTests.java
-│   │   │   ├── RunContentApi.java
-│   │   │   ├── RunDbTests.java
-│   │   │   └── RunTemplateApi.java
-│   │   └── utils/
-│   │       ├── KarateErrorUtils.java
-│   │       ├── OracleDbUtils.java
-│   │       └── SqlServerUtils.java
-
-│   ├── resources/
-│   │   └── files/
-│   │       └── DOCUMENTO DE PRUEBA CONTENT.pdf
-
-│   └── test/                        # Estructura principal de tests
-│       ├── common/                 # Utilidades JS compartidas
-│       │   ├── utils.js
-│       │   └── validators.js
-
-│       ├── content-manager-api/   # Casos de prueba de API Content Manager
-│       │   └── document/
-│       │       └── post/
-│       │           ├── auth/
-│       │           │   └── authorization-header.txt
-│       │           ├── data/
-│       │           │   ├── dynamic-data.js
-│       │           │   └── payload/
-│       │           │       └── carga-basica.json
-│       │           ├── features/
-│       │           │   └── load-new-document.feature
-│       │           └── schemas/
-│       │               ├── not-file-in-directory-response.json
-│       │               └── success-response.json
-
-│       └── template-api/          # APIs adicionales de ejemplo
-│           ├── database/features/
-│           │   └── test-db.feature
-│           ├── login/post/
-│           │   ├── data/
-│           │   │   └── dynamic-data.js
-│           │   ├── features/
-│           │   │   └── login.feature
-│           │   └── schemas/
-│           │       ├── login-error.json
-│           │       ├── login-successful.json
-│           │       └── login-unauthorized.json
-│           └── user/post/
-│               ├── data/
-│               │   └── dynamic-data.js
-│               ├── features/
-│               │   └── create-user.feature
-│               └── schemas/
-│                   └── create-user-success.json
-
-├── target/                         # Directorio de salida (ignorado por git)
-│   └── karate-reports/             # Reportes HTML de ejecución
-
-├── env.devel.json                  # Variables de entorno por ambiente
-├── env.qa.json
-├── env.pre-prod.json
-├── karate-config.js               # Config global de Karate
-├── logback-test.xml               # Configuración de logs
-├── pom.xml                        # Dependencias Maven
-├── README.md                      # Documentación del proyecto
-└── .gitignore
+> Esta estructura organiza el proyecto de pruebas API con Karate DSL, separando claramente la lógica de entorno, los recursos compartidos, y las suites por microservicio/módulo.
 
 
 ```
