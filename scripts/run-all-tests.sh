@@ -10,5 +10,5 @@ mvn test \
   -Dtest=test.RunAllTests \
   -Dkarate.env="$ENVIRONMENT" \
   -Dsurefire.printSummary=false
-
+  
 echo "✅ Ejecución finalizada correctamente para entorno: $ENVIRONMENT"

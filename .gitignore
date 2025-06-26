@@ -1,4 +1,15 @@
+# ❌ Ignorar 
+/env.qa.json
+/env.devel.json
+/env.pre-prod.json
 target/
 .idea/
 *.log
 *.class
+logback-test.xml
+simplelogger.properties
+
+# ✅ Asegurar subir
+!env.qa.json.enc
+!env.devel.json.enc
+!env.pre-prod.json.enc

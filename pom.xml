@@ -2,18 +2,21 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>cl.detacoop</groupId>
-    <artifactId>api-detacoop-tests</artifactId>
+
+    <groupId>cl.consalud</groupId>
+    <artifactId>api-consalud-tests</artifactId>
     <version>1.0.0</version>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <karate.version>1.1.0</karate.version>
+         <karate.version>1.1.0</karate.version> 
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <maven.surefire.version>3.0.0-M9</maven.surefire.version>
     </properties>
+
     <dependencies>
-        <!-- Karate Dependency -->
+        <!-- Karate DSL -->
         <dependency>
             <groupId>com.intuit.karate</groupId>
             <artifactId>karate-junit5</artifactId>
@@ -26,41 +29,84 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- JDBC Drivers -->
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <version>12.6.1.jre11</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>19.3.0.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.13</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Utilidades -->
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
     <build>
-        <!-- Test Resources from Both POMs -->
+        <!-- Runners ubicados en src/java/test -->
+        <testSourceDirectory>src/java</testSourceDirectory>
+
         <testResources>
-            <!-- Ruta estándar para variables de entorno -->
+            <!-- NUEVO: Configuración movida a la raíz del proyecto -->
             <testResource>
-                <directory>src/test/resources</directory>
+                <directory>.</directory>
+                <includes>
+                    <include>karate-config.js</include>
+                    <include>env.*.json</include>
+                    <include>logback-test.xml</include>
+                    <include>simplelogger.properties</include>
+                </includes>
             </testResource>
+
+            <!-- Copia todo src/resources a target -->
+            <testResource>
+                <directory>src/resources</directory>
+            </testResource>
+            <!-- Incluir common como carpeta adicional de recursos en target -->
+            <testResource>
+                <directory>src/test/common</directory>
+                <targetPath>common</targetPath> <!-- lo deja en target/test-classes/common -->
+                <includes>
+                    <include>**/*.js</include>
+                </includes>
+            </testResource>
+
+            <!-- Múltiples APIs: content-manager-api, template-api, etc -->
             <testResource>
                 <directory>src/test</directory>
-                <excludes>
-                    <exclude>resources/**</exclude> <!-- ⛔ evita copiar esta carpeta -->
-                </excludes>
                 <includes>
-                    <include>**/*.feature</include>
-                    <include>**/*.json</include>
-                    <include>**/*.txt</include>
-                    <include>**/*.js</include>
-                    <include>**/.env.*</include>
+                    <include>**/*-api/**/features/*.feature</include>
+                    <include>**/*-api/**/*.json</include>
+                    <include>**/*-api/**/*.txt</include>
+                    <include>**/*-api/**/*.js</include>
+                    <include>**/*-api/**/.env.*</include>
+                    <include>**/*.js</include>  <!--archivo
+                    custom de reporte copiado a classpath-->
                 </includes>
             </testResource>
         </testResources>
-        <!-- Plugins from New POM -->
+
         <plugins>
+            <!-- Compilación de código Java -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -70,6 +116,8 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
+            <!-- Plugin de ejecución de tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -80,7 +128,9 @@
                         <include>**/RunAllTests.java</include>
                     </includes>
                     <properties>
-                        <configurationParameters>junit.jupiter.extensions.autodetection.enabled=true</configurationParameters>
+                        <configurationParameters>
+                            junit.jupiter.extensions.autodetection.enabled=true
+                        </configurationParameters>
                     </properties>
                 </configuration>
             </plugin>

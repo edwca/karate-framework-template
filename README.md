@@ -6,354 +6,189 @@ Este proyecto automatiza pruebas de servicios REST utilizando [Karate DSL](https
 
 ## 🔧 Requisitos
 
-- **Java 17 o superior** (Karate no es compatible con Java 24 actualmente)
-- **Apache Maven 3.8+**
+- **Java 17 o superior** (Karate no es compatible con Java 24 actualmente --> https://adoptium.net/en-GB/temurin/releases/?version=17&os=any&arch=any)
+- **Apache Maven 3.8+** (https://maven.apache.org/download.cgi)
 - **Node.js** *(opcional, si usas JS en hooks o scripts complementarios)*
 - **Visual Studio Code** (recomendado) con extensiones para Java
 - **Karate 1.1.0** Recomendado por dependencias del proyecto
 - **karate-junit5** Recomendado por dependencias del proyecto
+- **Crear variables de sitema** de entorno %JAVA_HOME%\bin, %MAVEN_HOME%\bin, TNS_ADMIN(con la ubicacion del tsnames)
+- **Agregar rutas de instlacion en path de sistema**
+- **Agregar extension XML / karate (opcional ideal para la versión pagada)**
+- **Agregar variable de entorno con key para encryptar y decencryptar "ENV_SECRET_KEY"**
+- **Considerar subir tsnames.ora como archivo "Pipelines > Library > Secure Files" y otorgar permisos**
+
+# Comprobar instalaciones
+```
+- java: "java --version"
+- maven: "mvn -v"
+```
 ---
 
 ## 📁 Estructura del Proyecto
 ```
-Listado de rutas de carpetas para el volumen OS
-El n·mero de serie del volumen es 62C7-8631
-C:.
-ª   .gitignore
-ª   dockerfile
-ª   estructura.log
-ª   pom.xml
-ª   README.md
-ª   
-+---.github
-ª   +---workflows
-ª       ª   karate-tests.yml
-ª       ª   
-ª       +---templates
-ª               karate-tests_docker.yml
-ª               karate-tests_sh.yml
-ª               
-+---.vscode
-ª       karate-snippets.code-snippets
-ª       karate.code-snippets
-ª       settings.json
-ª       
-+---logs
-ª       run-login-tests.log
-ª       
-+---script
-ª       run-login-tests.sh
-ª       
-+---src
-ª   +---test
-ª       +---apiTemplateName
-ª       ª   +---database
-ª       ª   ª   +---data
-ª       ª   ª   +---feature
-ª       ª   ª           all-databases.feature
-ª       ª   ª           test-db.feature
-ª       ª   ª           
-ª       ª   +---login
-ª       ª   ª   +---post
-ª       ª   ª       +---data
-ª       ª   ª       ª       dynamic-data.js
-ª       ª   ª       ª       
-ª       ª   ª       +---features
-ª       ª   ª       ª       login.feature
-ª       ª   ª       ª       
-ª       ª   ª       +---schemas
-ª       ª   ª               login-error.json
-ª       ª   ª               login-successful.json
-ª       ª   ª               login-unauthorized.json
-ª       ª   ª               
-ª       ª   +---user
-ª       ª       +---post
-ª       ª           +---features
-ª       ª           ª       create-user.feature
-ª       ª           ª       
-ª       ª           +---schemas
-ª       ª                   create-user-success.json
-ª       ª                   
-ª       +---auth
-ª       ª       authorization-header.txt
-ª       ª       
-ª       +---java
-ª       ª   +---test
-ª       ª   ª       RunAllTests.java
-ª       ª   ª       RunLoginTests.java
-ª       ª   ª       RunUserTests.java
-ª       ª   ª       
-ª       ª   +---utils
-ª       ª           DbUtils.java
-ª       ª           KarateErrorUtils.java
-ª       ª           
-ª       +---resources
-ª               env.qa.devel.json
-ª               env.qa.json
-ª               env.qa.pre-prod.json
-ª               karate-config.js
-ª               logback-test.xml
-ª               simplelogger.properties
-ª               
-+---target
-    +---classes
-    +---generated-test-sources
-    ª   +---test-annotations
-    +---karate-reports
-    ª   ª   apiTemplateName.user.post.features.create-user.html
-    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746812971037
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   apiTemplateName.user.post.features.create-user.html
-    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746813133450
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   apiTemplateName.user.post.features.create-user.html
-    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746813278651
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   apiTemplateName.user.post.features.create-user.html
-    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746814833624
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   apiTemplateName.user.post.features.create-user.html
-    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746815289161
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   apiTemplateName.user.post.features.create-user.html
-    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746815378255
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746815391617
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   apiTemplateName.user.post.features.create-user.html
-    ª   ª   apiTemplateName.user.post.features.create-user.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---karate-reports_1746815404539
-    ª   ª   apiTemplateName.login.post.features.login.html
-    ª   ª   apiTemplateName.login.post.features.login.karate-json.txt
-    ª   ª   favicon.ico
-    ª   ª   karate-logo.png
-    ª   ª   karate-logo.svg
-    ª   ª   karate-progress-json.txt
-    ª   ª   karate-summary-json.txt
-    ª   ª   karate-summary.html
-    ª   ª   karate-tags.html
-    ª   ª   karate-timeline.html
-    ª   ª   
-    ª   +---res
-    ª           bootstrap.min.css
-    ª           bootstrap.min.js
-    ª           jquery.min.js
-    ª           jquery.tablesorter.min.js
-    ª           karate-report.css
-    ª           karate-report.js
-    ª           
-    +---maven-status
-    ª   +---maven-compiler-plugin
-    ª       +---testCompile
-    ª           +---default-testCompile
-    ª                   createdFiles.lst
-    ª                   inputFiles.lst
-    ª                   
-    +---surefire-reports
-    ª       TEST-test.RunAllTests.xml
-    ª       TEST-test.RunLoginTests.xml
-    ª       TEST-test.RunUserTests.xml
-    ª       test.RunAllTests.txt
-    ª       test.RunLoginTests.txt
-    ª       test.RunUserTests.txt
-    ª       
-    +---test-classes
-        ª   env.qa.devel.json
-        ª   env.qa.json
-        ª   env.qa.pre-prod.json
-        ª   karate-config.js
-        ª   logback-test.xml
-        ª   simplelogger.properties
-        ª   
-        +---apiTemplateName
-        ª   +---database
-        ª   ª   +---feature
-        ª   ª           all-databases.feature
-        ª   ª           test-db.feature
-        ª   ª           
-        ª   +---login
-        ª   ª   +---post
-        ª   ª       +---data
-        ª   ª       ª       dynamic-data.js
-        ª   ª       ª       
-        ª   ª       +---features
-        ª   ª       ª       login.feature
-        ª   ª       ª       
-        ª   ª       +---schemas
-        ª   ª               login-error.json
-        ª   ª               login-successful.json
-        ª   ª               login-unauthorized.json
-        ª   ª               
-        ª   +---user
-        ª       +---post
-        ª           +---features
-        ª           ª       create-user.feature
-        ª           ª       
-        ª           +---schemas
-        ª                   create-user-success.json
-        ª                   
-        +---auth
-        ª       authorization-header.txt
-        ª       
-        +---test
-        ª       RunAllTests.class
-        ª       RunLoginTests.class
-        ª       RunUserTests.class
-        ª       
-        +---utils
-                DbUtils.class
-                KarateErrorUtils.class
-                
+📁 api-testing/
+├── .github/                         # Workflows de CI/CD
+│   └── workflows/
+│       ├── karate-tests.yml
+│       └── templates/
+│           ├── karate-tests_docker.yml
+│           └── karate-tests_sh.yml
+
+├── .vscode/                         # Configuraciones de VSCode
+│   ├── karate.code-snippets
+│   └── settings.json
+
+├── scripts/                         # Scripts para generación y ejecución
+│   ├── generate-karate-schema.js
+│   ├── generate-schema.sh / .bat
+│   ├── input/
+│   │   └── input-response.json      # Ejemplo: response copiado desde Postman
+│   └── out-put/
+│       └── schema.json              # Schema generado automáticamente
+
+├── src/
+│   ├── java/
+│   │   ├── test/                    # Clases Runner de Karate
+│   │   │   ├── RunAllTests.java
+│   │   │   ├── RunContentApi.java
+│   │   │   ├── RunDbTests.java
+│   │   │   └── RunTemplateApi.java
+│   │   └── utils/
+│   │       ├── KarateErrorUtils.java
+│   │       ├── OracleDbUtils.java
+│   │       └── SqlServerUtils.java
+
+│   ├── resources/
+│   │   └── files/
+│   │       └── DOCUMENTO DE PRUEBA CONTENT.pdf
+
+│   └── test/                        # Estructura principal de tests
+│       ├── common/                 # Utilidades JS compartidas
+│       │   ├── utils.js
+│       │   └── validators.js
+
+│       ├── content-manager-api/   # Casos de prueba de API Content Manager
+│       │   └── document/
+│       │       └── post/
+│       │           ├── auth/
+│       │           │   └── authorization-header.txt
+│       │           ├── data/
+│       │           │   ├── dynamic-data.js
+│       │           │   └── payload/
+│       │           │       └── carga-basica.json
+│       │           ├── features/
+│       │           │   └── load-new-document.feature
+│       │           └── schemas/
+│       │               ├── not-file-in-directory-response.json
+│       │               └── success-response.json
+
+│       └── template-api/          # APIs adicionales de ejemplo
+│           ├── database/features/
+│           │   └── test-db.feature
+│           ├── login/post/
+│           │   ├── data/
+│           │   │   └── dynamic-data.js
+│           │   ├── features/
+│           │   │   └── login.feature
+│           │   └── schemas/
+│           │       ├── login-error.json
+│           │       ├── login-successful.json
+│           │       └── login-unauthorized.json
+│           └── user/post/
+│               ├── data/
+│               │   └── dynamic-data.js
+│               ├── features/
+│               │   └── create-user.feature
+│               └── schemas/
+│                   └── create-user-success.json
+
+├── target/                         # Directorio de salida (ignorado por git)
+│   └── karate-reports/             # Reportes HTML de ejecución
+
+├── env.devel.json                  # Variables de entorno por ambiente
+├── env.qa.json
+├── env.pre-prod.json
+├── karate-config.js               # Config global de Karate
+├── logback-test.xml               # Configuración de logs
+├── pom.xml                        # Dependencias Maven
+├── README.md                      # Documentación del proyecto
+└── .gitignore
+
+
 ```
+
+---
+# 🔐 Gestión segura de archivos de entorno en ApiTesting
+
+Este proyecto utiliza archivos `.json` con credenciales y configuraciones sensibles como:
+
+- `env.qa.json`
+- `env.devel.json`
+- `env.pre-prod.json`
+
+Para proteger esta información sensible y cumplir con buenas prácticas de seguridad y normativas de protección de datos, **estos archivos se encriptan** antes de subirse al repositorio.
+
+# 🔐 Método de encriptación utilizado
+En tu proyecto estamos utilizando el siguiente esquema:
+
+AES-256-CBC
+AES: Advanced Encryption Standard.
+
+256: Tamaño de clave de 256 bits (clave fuerte).
+
+CBC: Cipher Block Chaining — un modo que encadena bloques y usa un IV (vector de inicialización) aleatorio para cada cifrado.
+
+¿Cómo se aplica?
+La clave (ENV_SECRET_KEY) se convierte en una clave binaria de 256 bits con SHA-256.
+
+Se genera un IV aleatorio por cada archivo cifrado.
+
+El IV se adjunta al inicio del archivo .enc, permitiendo el descifrado sin almacenamiento externo de IV.
+
+---
+
+## 📦 Archivos encriptados
+
+Solo los siguientes archivos deben ser versionados (subidos a Git):
+
+- `env.qa.json.enc`
+- `env.devel.json.enc`
+- `env.pre-prod.json.enc`
+
+Los `.json` planos deben agregarse al `.gitignore`.
+
+---
+
+## ⚙️ Requisitos
+
+- Node.js `>= 16`
+- Tener definidos los scripts:
+  - `scripts/encrypt-env.js`
+  - `scripts/decrypt-env.js`
+- Clave segura definida como variable de entorno `ENV_SECRET_KEY`.
+
+---
+
+## 🛠️ Comandos para cifrado y descifrado
+
+| Acción            | Entorno       | Comando                                                                 |
+|-------------------|---------------|-------------------------------------------------------------------------|
+| **Cifrar archivos**     | PowerShell    | `$env:ENV_SECRET_KEY = "clave-secreta"; node scripts/encrypt-env.js`  |
+|                       | Bash / Linux | `ENV_SECRET_KEY="clave-secreta" node scripts/encrypt-env.js`          |
+| **Descifrar archivos** | PowerShell    | `$env:ENV_SECRET_KEY = "clave-secreta"; node scripts/decrypt-env.js`  |
+|                       | Bash / Linux | `ENV_SECRET_KEY="clave-secreta" node scripts/decrypt-env.js`          |
+
+> 📝 Reemplaza `"clave-secreta"` por tu clave real del entorno (`qa`, `devel`, `pre-prod`).
+
+> 📝 !Importante, se debe ejecutar una parte del comando primero y luego la siguiente:
+
+    > 1.- `$env:ENV_SECRET_KEY = "clave-secreta"; `
+    > 2.-  `node scripts/encrypt-env.js `
+
+
+📌 La clave **nunca debe subirse al repositorio**. Debe definirse como variable local o en Azure DevOps como `ENV_SECRET_KEY` protegida.
+
 
 ---
 
@@ -379,17 +214,47 @@ archivos que podemos encontrar en
 src\test\resources\env.qa.json
 ```
 
+## Crear schemas para validar en los escenarios
+
+```bash
+# 1.- Debemos copiar nuestro response a convertir en
+scripts\input\input-response.json
+
+# 2.- Ejecutar segun terminal
+
+# powershell
+scripts/generate-schema.bat   
+
+# bash
+bash scripts/generate-schema.sh
+
+# 3.- Validar la salida del schema en:
+scripts\out-put\schema.json
+
+# 4.- llevar el archivo de salida a la api que se desea trabajar
+# Renombrar el archivo segun sea el caso
+ej: 
+
+"src\test\content-manager-api\document\post\schemas\sucessful-response.json"
+```
+
+
 ## Ejecuciones Manuales desde CLI powerShell
 
 ```bash
 # Todos los tests - "-Dsurefire.printSummary=false" imprime en consola un log mas limpio
 mvn test "-Dtest=test.RunAllTests" "-Dkarate.env=qa" "-Dsurefire.printSummary=false" 
 
-# Solo login
-mvn test "-Dtest=test.RunLoginTests" "-Dkarate.env=qa" "-Dsurefire.printSummary=false" 
+# Solo ContentApi
+mvn test "-Dtest=test.RunContentApi" "-Dkarate.env=devel" "-Dsurefire.printSummary=false" 
 
-# Solo user
-mvn test "-Dtest=test.RunUserTests" "-Dkarate.env=qa" "-Dsurefire.printSummary=false" 
+# Ejecutar ContentApi mediante un TAG
+mvn test "-Dtest=test.RunContentApi" "-Dkarate.env=devel" "-Dkarate.options=--tags @CONTENT-MANAGER" "-Dsurefire.printSummary=false"
+
+# Solo Template Api
+mvn test "-Dtest=test.RunTemplateApi" "-Dkarate.env=qa" "-Dsurefire.printSummary=false" 
+
+
 ```
 
 > Asegúrate que las clases `RunLoginTests.java` y `RunUserTests.java` estén ubicadas correctamente bajo `src/test/java/login/post/` y `src/test/java/user/post/` respectivamente.
@@ -461,6 +326,7 @@ Este proyecto es apto para CI/CD con:
 - GitHub Actions
 - GitLab CI
 - Jenkins
+- Azure Devops
 
 Simplemente ejecuta los comandos Maven dentro del job correspondiente.
 
@@ -468,4 +334,4 @@ Simplemente ejecuta los comandos Maven dentro del job correspondiente.
 
 ## 👨‍💻 Autor
 
-Proyecto desarrollado y mantenido por el equipo de QA de **Detacoop**.
+Proyecto desarrollado y mantenido por **GCM**.

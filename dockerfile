@@ -6,4 +6,4 @@ COPY . .
 
 RUN mvn clean install -DskipTests
 
-CMD ["./scripts/run-all-tests.sh"]
+CMD ["./scripts/run-all-tests-githa.sh"]

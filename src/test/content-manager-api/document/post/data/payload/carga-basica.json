@@ -1,0 +1,22 @@
+{
+  "idSistema": 722,
+  "idTipoDocto_CM": null,
+  "idFolio": 987654321,
+  "codContent": null,
+  "imagen": "DOCUMENTO DE PRUEBA CONTENT.pdf",
+  "depto": "BNF",
+  "apPat": "BERNARDI",
+  "apMat": "OYARZUN",
+  "nombres": "ANGELO GONZALO",
+  "rut": "13996327",
+  "dig": "K",
+  "fecVisa": "19-06-2023",
+  "codUsuario": "ABERNARDI",
+  "codArea": "SIL",
+  "codSistMat": "G06-GCCM",
+  "codTipo": "S",
+  "Etapa": "ETA1",
+  "strCodAccion": "INGDOCTO",
+  "idSecDetal": 1,
+  "folioSuscripcion": 1000
+}

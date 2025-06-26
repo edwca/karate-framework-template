@@ -1,0 +1,144 @@
+resources:
+  repositories:
+    - repository: self
+      type: git
+      name: ApiTesting
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool: DockerAgents
+
+parameters:
+  - name: env
+    displayName: "Ambiente de ejecución"
+    type: string
+    default: "qa"
+    values:
+      - qa
+      - devel
+      - pre-prod
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$(Pipeline.Workspace)/.m2/repository"
+  ENV: ${{ parameters.env }}
+
+stages:
+  - stage: Test
+    displayName: Ejecutar pruebas de Karate
+    jobs:
+      - job: karateTests
+        displayName: Run Karate Tests
+        continueOnError: false
+        steps:
+          - task: DownloadSecureFile@1
+            name: tnsora
+            inputs:
+              secureFile: "tnsnames.ora"
+            displayName: Descargar archivo tnsnames.ora seguro desde azure pipeline
+
+          - script: |
+              echo "📁 Configurando TNS_ADMIN seguro..."
+              mkdir -p $(Build.SourcesDirectory)/.oracle/network/admin
+              cp $(tnsora.secureFilePath) $(Build.SourcesDirectory)/.oracle/network/admin/tnsnames.ora
+            displayName: Configurar ruta TNS_ADMIN
+
+          - script: |
+              echo "📦 Instalando Java 17 y Maven 3.9.6 localmente..."
+
+              JAVA_VERSION=17.0.10+7
+              JAVA_BUILD=7
+              JAVA_DIR=$(Agent.ToolsDirectory)/jdk-17
+              MAVEN_VERSION=3.9.6
+              MAVEN_DIR=$(Agent.ToolsDirectory)/apache-maven-${MAVEN_VERSION}
+
+              mkdir -p $JAVA_DIR $MAVEN_DIR
+
+              curl -L -o java.tar.gz https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.10%2B${JAVA_BUILD}/OpenJDK17U-jdk_x64_linux_hotspot_17.0.10_${JAVA_BUILD}.tar.gz
+              tar -xzf java.tar.gz -C $JAVA_DIR --strip-components=1
+
+              curl -fsSL https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+                | tar -xz -C $(Agent.ToolsDirectory)
+
+              echo "✅ Instalación finalizada"
+            displayName: Instalar Java y Maven localmente
+
+          - script: |
+              echo "🔐 Desencriptando archivos de entorno (.enc → .json)..."
+              node scripts/decrypt-env.js
+            env:
+              ENV_SECRET_KEY: $(ENV_SECRET_KEY)
+            displayName: Desencriptar archivos de entorno para Karate
+
+          - script: |
+              echo "⚙️ Configurando entorno para Karate..."
+              echo "export JAVA_HOME=$(Agent.ToolsDirectory)/jdk-17" > karate-env.sh
+              echo "export MAVEN_HOME=$(Agent.ToolsDirectory)/apache-maven-3.9.6" >> karate-env.sh
+              echo 'export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH' >> karate-env.sh
+              echo "export TNS_ADMIN=$(Build.SourcesDirectory)/.oracle/network/admin" >> karate-env.sh
+              chmod +x karate-env.sh
+            displayName: Definir entorno JAVA/MAVEN y TNS
+
+          - script: chmod +x scripts/*.sh
+            displayName: Hacer scripts ejecutables
+
+          - script: |
+              echo "🧪 Preparando keep-alive..."
+              source karate-env.sh
+              (while true; do echo "⌛ Ejecutando Karate..."; sleep 60; done) &
+              echo $! > keepalive.pid
+            displayName: Iniciar keep-alive
+
+          - script: |
+              echo "🔎 Verificando contenido de TNS_ADMIN..."
+              export TNS_ADMIN="$(Build.SourcesDirectory)/.oracle/network/admin"
+              echo "Ruta esperada: $TNS_ADMIN/tnsnames.ora"
+              if [ -f "$TNS_ADMIN/tnsnames.ora" ]; then
+                echo "✅ tnsnames.ora encontrado:"
+                cat "$TNS_ADMIN/tnsnames.ora"
+              else
+                echo "❌ No se encontró tnsnames.ora en $TNS_ADMIN"
+                exit 1
+              fi
+            displayName: Validar existencia de tnsnames.ora
+
+          - script: |
+              echo "🔍 Probar acceso a ruta compartida..."
+              ls -l "//messner/Lexmark" || echo "❌ No se pudo acceder a la carpeta compartida"
+            displayName: Test acceso a red compartida
+
+          - script: |
+              echo "🚀 Ejecutando pruebas Karate..."
+              source karate-env.sh
+              ./scripts/run-all-tests.sh ${{ parameters.env }}
+            displayName: Ejecutar Karate Tests
+            env:
+              TNS_ADMIN: $(Build.SourcesDirectory)/.oracle/network/admin
+              JAVA_TOOL_OPTIONS: "-Doracle.jdbc.timezoneAsRegion=false"
+
+          - script: |
+              echo "🛑 Deteniendo keep-alive..."
+              kill $(cat keepalive.pid) || echo "Keep-alive ya detenido"
+            displayName: Detener keep-aliv
+
+          - script: |
+              echo "📦 Comprimir reportes Karate..."
+              mkdir -p $(Build.ArtifactStagingDirectory)/karate-reports
+              zip -r -j $(Build.ArtifactStagingDirectory)/karate-report.zip $(Build.SourcesDirectory)/target/karate-reports || echo "No reports to zip"
+            displayName: Comprimir reportes Karate
+            condition: always()
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: "$(Build.ArtifactStagingDirectory)"
+              ArtifactName: "karate-report"
+              publishLocation: "Container"
+            displayName: Subir reporte Karate ZIP
+            condition: always()

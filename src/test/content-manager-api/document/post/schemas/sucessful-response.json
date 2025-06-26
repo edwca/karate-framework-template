@@ -1,0 +1,10 @@
+{
+  "Result": {
+    "idcontent": "#string",
+    "estadoCarga": "#string",
+    "mensajeError": "#string"
+  },
+  "Error": "#null",
+  "SuccessfulOperation": true,
+  "OperationName": "#null"
+}

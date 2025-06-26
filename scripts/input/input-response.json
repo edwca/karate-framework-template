@@ -1,0 +1,10 @@
+{
+    "Result": {
+        "idcontent": null,
+        "estadoCarga": "NOK",
+        "mensajeError": "Error: Archivo no encontrado en la ruta traspaso \\\\messnerdesa\\lexmark\\DOCUMENTO DE PRUEBA CONTENT.pdf"
+    },
+    "Error": null,
+    "SuccessfulOperation": true,
+    "OperationName": null
+}
